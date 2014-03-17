@@ -19,12 +19,12 @@ public class DBSaver {
 //		ArrayList<String> basicInfoList =  new ArrayList<String>();
 		
 
-		ArrayList<String> files = fh.listFilesForFolder(new File("F:/SP PROCESSED DATA/processed/feb 20"));
+		ArrayList<String> files = fh.listFilesForFolder(new File("D:/SP PROCESSED DATA/latest_now(set 4)"));
                 String filename;
 
                 DatabaseHandler dbh = new DatabaseHandler();
                 dbh.openDBconn();
-                String directoryOfSaved = "F:\\savedData";
+                String directoryOfSaved = "D:/savedData/set 4";
                 for(int i=0;i<files.size();i++){
                     filename = files.get(i).substring(files.get(i).lastIndexOf('\\')+1, files.get(i).length());
                     String uid = filename.substring(0,filename.indexOf('_'));
@@ -32,12 +32,11 @@ public class DBSaver {
                     fh = new FileHandler();
                     fh.readFile(files.get(i));
                     
-                    //System.out.println(files.get(i));
                     postList = fh.getPostList();
                     //process post then save to db
                     if(postList.size()>0){
                         System.out.println("has posts");
-                        dbs.savePostToDB(postList, dbh, uid);
+                        dbs.savePostToDB(postList, dbh, filename.replaceAll(".txt", ""));
                     }
 /*
                     likesList = fh.getLikesList();
@@ -195,7 +194,7 @@ public class DBSaver {
                         String[] line = attribute.split("\t");
                         if(line[0].equals("message")){
                             hasMessage = true;
-                            message = getMessage(line);
+                            message = getStatusMessage(line);
                         } else if(line[0].equals("created_time")) {
                                 created_time = line[1];
                         } else if(line[0].equals("comments")) {
@@ -266,8 +265,16 @@ public class DBSaver {
             } 
         }
         
-        public String getMessage(String[] line){
-            return "";
+        public String getStatusMessage(String[] line){
+            StringBuilder message = new StringBuilder();
+            
+            for(int i = 1; i < line.length; i++){
+                message.append(line[i]);
+                message.append("\t");
+                System.out.print(line[i] + "\t");
+            }
+					
+            return message.toString();
         }
 	public String toDateTimeFormat(String createdTime){
 		Date ct;

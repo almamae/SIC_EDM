@@ -15,32 +15,47 @@ import java.lang.*;
 
 
 public class ConcensusFetcher {
-      public void seekConsensus() throws IOException{
-    FileHandler fh = new FileHandler();
-
-    File fLister = new File("C:/Users/RocheLee/Documents/ROCHE/ACADS/2013-2014 2nd sem/CMSC 198.2 - SP/Codes/SET 8 classified Data/ALMA_MAE/set 8");
-    ArrayList<String> files = fh.listFilesForFolder(fLister);
-
-    ArrayList<String> statList1 = new ArrayList<String>();
-    ArrayList<String> statList2 = new ArrayList<String>();
-
-    /*File fLister1 = new File("C:/Users/RocheLee/Documents/ROCHE/ACADS/2013-2014 2nd sem/CMSC 198.2 - SP/Codes/SET 8 classified Data/ROCHE/set 8");
-    ArrayList<String> files = fh.listFilesForFolder(fLister1);*/
-    String filename, uid;
-
-    for(int i=0; i<files.size();i++){
-      filename = files.get(i).substring(files.get(i).lastIndexOf('\\')+1, files.get(i).length());
-      uid = filename.substring(0,filename.lastIndexOf('_'));
-      System.out.println(uid);
-
-      statList1 = fh.readIdentifiedFile(files.get(i));//alma
-      statList2 = fh.readIdentifiedFile("C:/Users/RocheLee/Documents/ROCHE/ACADS/2013-2014 2nd sem/CMSC 198.2 - SP/Codes/SET 8 classified Data/ROCHE_LEE/set 8/"+uid+"_Rclassifiedstat.txt");//roche
-      //fh.loadStatLists("ako_Rclassifiedstat.txt","ako_Aclassifiedstat.txt");
-
-      ArrayList<String> consensusStats = compare(statList1, statList2);
-      fh.writeFile("C:/Users/RocheLee/Documents/ROCHE/ACADS/2013-2014 2nd sem/CMSC 198.2 - SP/Codes/SET 8 classified Data/CONSENSUS/set 8/"+uid+"_consensus_stats.txt", consensusStats);
-
+    
+    public static void main(String[] args){
+        ConcensusFetcher concensusFetcher = new ConcensusFetcher();
+        try {
+            concensusFetcher.seekConsensus("F:/ALMA CLASSIFIED FILES/set 6", "F:/ROCHE CLASSIFIED FILES/set6");
+        } catch(IOException e) {
+           System.out.println("Error in file handling.");
+        }
     }
+    public void seekConsensus(String almaDirectory, String rocheDirectory) throws IOException{
+        FileHandler fh = new FileHandler();
+
+        File fLister = new File(almaDirectory);
+        ArrayList<String> files = fh.listFilesForFolder(fLister);
+
+        ArrayList<String> statList1 = new ArrayList<String>();
+        ArrayList<String> statList2 = new ArrayList<String>();
+
+        /*File fLister1 = new File("C:/Users/RocheLee/Documents/ROCHE/ACADS/2013-2014 2nd sem/CMSC 198.2 - SP/Codes/SET 8 classified Data/ROCHE/set 8");
+        ArrayList<String> files = fh.listFilesForFolder(fLister1);*/
+        String filename, uid;
+
+        for(int i=0; i<files.size();i++){
+            filename = files.get(i).substring(files.get(i).lastIndexOf('\\')+1, files.get(i).length());
+            uid = filename.substring(0,filename.lastIndexOf('_'));
+            System.out.println(uid);
+
+            statList1 = fh.readIdentifiedFile(files.get(i));//alma
+            statList2 = fh.readIdentifiedFile(rocheDirectory+"/"+uid+".txt_Rclassifiedstat.txt");//roche
+            //fh.loadStatLists("ako_Rclassifiedstat.txt","ako_Aclassifiedstat.txt");
+            System.out.println(statList1.size() + " " + statList2.size());
+            if(statList1.size() != statList2.size()){
+                fh.writeFile(files.get(i).replaceAll("set 6", "set 6_1"), statList1);
+                fh.writeFile(rocheDirectory.replaceAll("set6", "set 6_1/")+uid+"_Rclassifiedstat.txt", statList2);
+            }
+            else {
+                ArrayList<String> consensusStats = compare(statList1, statList2);
+                fh.writeFile("F:/CONSENSUS/set 6/"+uid+"_consensus_stats.txt", consensusStats);
+            }
+
+        }
   }
 
   public ArrayList<String> compare(ArrayList<String> statList1, ArrayList<String> statList2){
@@ -74,15 +89,13 @@ public class ConcensusFetcher {
     return consensusStats;
   }
   
-  public ArrayList<String> getConcensusPerPerson(String uid){
+  public ArrayList<String> getConcensusPerPerson(String filename){
       ArrayList<String> concensusStatList = new ArrayList();
-      String directory = "F:\\CONSENSUS\\set 8";
-      String filename = uid;
-      filename += "_indirect_output_consensus_stats.txt";
+      filename += "_consensus_stats.txt";
       System.out.println(filename);
       FileHandler fh = new FileHandler();
       try{
-          concensusStatList = fh.readIdentifiedFile("F:\\CONSENSUS\\set 8\\"+filename);
+          concensusStatList = fh.readIdentifiedFile("D:\\CONSENSUS\\set 4\\"+filename);
       } catch (IOException e) {
       
       }
